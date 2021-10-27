@@ -8,3 +8,40 @@ services:
       - ./.docker/virtualhost.conf:/etc/apache2/sites-available/000-default.conf
     ports:
       - "80:80"
+    depends_on:
+      - "mysql"
+    networks:
+      - dev
+ mysql:
+    image: mysql:8.0
+    container_name: rgi_mysql
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "true"
+      MYSQL_ROOT_PASSWORD:
+      MYSQL_DATABASE: froppit1_rgi1
+      MYSQL_USER: dev
+      MYSQL_PASSWORD: dev
+    ports:
+      - "9906:3306"
+    networks:
+      - dev
+ phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    container_name: rgi_phpmyadmin
+    links:
+      - mysql
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_ARBITRARY: 1
+      PMA_USER: dev
+      PMA_PASSWORD: dev
+    networks:
+      - dev
+    ports:
+      - 81:80
+networks:
+  dev:
+    name: dev
+    driver: bridge
